@@ -8,41 +8,44 @@
 #include <stdlib.h>
 #include "slist.cburleso.h"
 
+// Insert a student node into the linked list
 int insertStudent(StudentListNode **list, int id, char *name){
-    // check to see if id already exists in the list
-    int found = findStudent(*list, id, &name);
-    if(found == 0){
+    // Check if the record already exists before creating a new record
+    if(findStudent(*list, id, &name) == 0){
         return 1;
     }
-    // Create temp student to hold place
-    StudentListNode* tempStudent;
+    // Temp student node to keep track of place in list
+    StudentListNode* temp;
 
-    // Create currentStudent to represent data being entered into list
-    StudentListNode* currentStudent;
-    currentStudent = (StudentListNode *)malloc(sizeof(StudentListNode));
-    currentStudent->id = id;
-    strcpy(currentStudent->name,name);
+    // Create newStudent node to be entered into the list
+    StudentListNode* newStudent;
+    newStudent = (StudentListNode *)malloc(sizeof(StudentListNode));
+    newStudent->id = id;
+    strcpy(newStudent->name,name);
 
-    // Case for head node
-    if((*list) == NULL || (*list)->id > currentStudent->id){
-        currentStudent->next = (*list);
-        (*list) = currentStudent;
+    // If the list is empty or the first element has a greater ID than the newStudent node
+    if((*list) == NULL || (*list)->id > newStudent->id){
+        newStudent->next = (*list);
+        (*list) = newStudent;
     }else{
-        tempStudent = (*list);
-        // Find place where node belongs in list before inserting it (Ascending order)
-        while(tempStudent->next != NULL && tempStudent->next->id < currentStudent->id){
-            tempStudent = tempStudent->next;
+        temp = (*list);
+
+        // Iterate until there is a node with a greater ID than the newStudent node ID
+        while(temp->next != NULL && temp->next->id < newStudent->id){
+            temp = temp->next;
         }
-        // Insert node into list
-        currentStudent->next = tempStudent->next;
-        tempStudent->next = currentStudent;
+
+        // Place the newStudent in the correct spot within the linked list
+        newStudent->next = temp->next;
+        temp->next = newStudent;
     }
-    // node inserted
+
     return 0;
 }
-// Find student in list
+
+// Find a student record with a specified ID
 int findStudent(StudentListNode *list, int id, char *name){
-    // Empty list
+    // If the list is empty, return 1
     if(list == NULL){
         return 1;
     }else{
@@ -51,45 +54,52 @@ int findStudent(StudentListNode *list, int id, char *name){
         }
         if(list == NULL){
             return 1;
-        }else if(list->id == id){
+        }else if(list->id == id){ // Once found, copy the given name parameter to the nodes name field
             strcpy(name,list->name);
             return 0;
         }
     }
 }
-// delete student from list
+
+// Delete a student with a specified ID within the list
 int deleteStudent(StudentListNode **list, int id){
-    StudentListNode* tempStudent = *list, *previousStudent;
-    // If head student is being deleted
-    while(tempStudent != NULL && tempStudent->id == id){
-        *list = tempStudent->next;
-        tempStudent = *list;
+    // Create temp pointers to use
+    StudentListNode* temp = *list, *prevStudent;
+
+    // Case where head node is deleted
+    while(temp != NULL && temp->id == id){
+        *list = temp->next;
+        temp = *list;
         return 0;
     }
-    // deleting other than head student
-    while (tempStudent != NULL){
-        // search for student that needs to be deleted
-        while(tempStudent != NULL && tempStudent->id != id){
-            previousStudent = tempStudent;
-            tempStudent = tempStudent->next;
+
+    // Search and delete node with the given ID (not head)
+    while (temp != NULL){
+        while(temp != NULL && temp->id != id){
+            prevStudent = temp;
+            temp = temp->next;
         }
-        // If not found
-        if(tempStudent == NULL){
+        // If the node was not found
+        if(temp == NULL){
             return 1;
         }
-        // if found unlink to be deleted
-        previousStudent->next = tempStudent->next;
+
+        // Have previous student node point to the next node after, "deleting" the specified node
+        prevStudent->next = temp->next;
         return 0;
     }
 }
-// print entire list out
+
+// Displays the names of each student node user
 int printList(StudentListNode *list) {
-    StudentListNode *currentStudent = list;
-    while (currentStudent != NULL) {
-        printf("%d |%s|\n", currentStudent->id, currentStudent->name);
-        currentStudent = currentStudent->next;
+
+    // Given node
+    StudentListNode *theStudent = list;
+    while (theStudent != NULL) {
+        printf("%d |%s|\n", theStudent->id, theStudent->name); // Display the ID and name values of the nodes
+        theStudent = theStudent->next; // Go to the "next" link / node in the list
     }
-    if (list == NULL) {
+    if (list == NULL) { // If the list is empty, print "empty list" to the console
         printf("(empty list)\n");
     }
     return 0;

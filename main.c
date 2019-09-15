@@ -50,6 +50,8 @@ int main() {
     else
         printf("failed to insert %s\n", name);
 
+    printList(theList);
+
 //---------------------------------------------------------------
 
     number = 1;
